@@ -117,7 +117,7 @@ var _ = Describe("Timeout tests", func() {
 		server, err := quic.ListenAddr(
 			"localhost:0",
 			getTLSConfig(),
-			getQuicConfig(nil),
+			getQuicConfig(&quic.Config{DisablePathMTUDiscovery: true}),
 		)
 		Expect(err).ToNot(HaveOccurred())
 		defer server.Close()
@@ -146,7 +146,7 @@ var _ = Describe("Timeout tests", func() {
 		sess, err := quic.DialAddr(
 			fmt.Sprintf("localhost:%d", proxy.LocalPort()),
 			getTLSClientConfig(),
-			getQuicConfig(&quic.Config{MaxIdleTimeout: idleTimeout}),
+			getQuicConfig(&quic.Config{DisablePathMTUDiscovery: true, MaxIdleTimeout: idleTimeout}),
 		)
 		Expect(err).ToNot(HaveOccurred())
 		strIn, err := sess.AcceptStream(context.Background())
@@ -187,7 +187,7 @@ var _ = Describe("Timeout tests", func() {
 			server, err := quic.ListenAddr(
 				"localhost:0",
 				getTLSConfig(),
-				getQuicConfig(nil),
+				getQuicConfig(&quic.Config{DisablePathMTUDiscovery: true}),
 			)
 			Expect(err).ToNot(HaveOccurred())
 			defer server.Close()
@@ -204,7 +204,7 @@ var _ = Describe("Timeout tests", func() {
 			sess, err := quic.DialAddr(
 				fmt.Sprintf("localhost:%d", server.Addr().(*net.UDPAddr).Port),
 				getTLSClientConfig(),
-				getQuicConfig(&quic.Config{MaxIdleTimeout: idleTimeout}),
+				getQuicConfig(&quic.Config{MaxIdleTimeout: idleTimeout, DisablePathMTUDiscovery: true}),
 			)
 			Expect(err).ToNot(HaveOccurred())
 			startTime := time.Now()
@@ -232,7 +232,7 @@ var _ = Describe("Timeout tests", func() {
 			server, err := quic.ListenAddr(
 				"localhost:0",
 				getTLSConfig(),
-				getQuicConfig(nil),
+				getQuicConfig(&quic.Config{DisablePathMTUDiscovery: true}),
 			)
 			Expect(err).ToNot(HaveOccurred())
 			defer server.Close()
@@ -262,7 +262,7 @@ var _ = Describe("Timeout tests", func() {
 			sess, err := quic.DialAddr(
 				fmt.Sprintf("localhost:%d", proxy.LocalPort()),
 				getTLSClientConfig(),
-				getQuicConfig(&quic.Config{MaxIdleTimeout: idleTimeout}),
+				getQuicConfig(&quic.Config{MaxIdleTimeout: idleTimeout, DisablePathMTUDiscovery: true}),
 			)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -303,7 +303,7 @@ var _ = Describe("Timeout tests", func() {
 		server, err := quic.ListenAddr(
 			"localhost:0",
 			getTLSConfig(),
-			getQuicConfig(nil),
+			getQuicConfig(&quic.Config{DisablePathMTUDiscovery: true}),
 		)
 		Expect(err).ToNot(HaveOccurred())
 		defer server.Close()
@@ -331,8 +331,9 @@ var _ = Describe("Timeout tests", func() {
 			fmt.Sprintf("localhost:%d", proxy.LocalPort()),
 			getTLSClientConfig(),
 			getQuicConfig(&quic.Config{
-				MaxIdleTimeout: idleTimeout,
-				KeepAlive:      true,
+				MaxIdleTimeout:          idleTimeout,
+				KeepAlive:               true,
+				DisablePathMTUDiscovery: true,
 			}),
 		)
 		Expect(err).ToNot(HaveOccurred())
@@ -403,7 +404,7 @@ var _ = Describe("Timeout tests", func() {
 			ln, err := quic.Listen(
 				&faultyConn{PacketConn: conn, MaxPackets: maxPackets},
 				getTLSConfig(),
-				getQuicConfig(nil),
+				getQuicConfig(&quic.Config{DisablePathMTUDiscovery: true}),
 			)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -420,8 +421,9 @@ var _ = Describe("Timeout tests", func() {
 					fmt.Sprintf("localhost:%d", ln.Addr().(*net.UDPAddr).Port),
 					getTLSClientConfig(),
 					getQuicConfig(&quic.Config{
-						HandshakeIdleTimeout: handshakeTimeout,
-						MaxIdleTimeout:       handshakeTimeout,
+						HandshakeIdleTimeout:    handshakeTimeout,
+						MaxIdleTimeout:          handshakeTimeout,
+						DisablePathMTUDiscovery: true,
 					}),
 				)
 				if err != nil {
@@ -453,9 +455,10 @@ var _ = Describe("Timeout tests", func() {
 				"localhost:0",
 				getTLSConfig(),
 				getQuicConfig(&quic.Config{
-					HandshakeIdleTimeout: handshakeTimeout,
-					MaxIdleTimeout:       handshakeTimeout,
-					KeepAlive:            true,
+					HandshakeIdleTimeout:    handshakeTimeout,
+					MaxIdleTimeout:          handshakeTimeout,
+					KeepAlive:               true,
+					DisablePathMTUDiscovery: true,
 				}),
 			)
 			Expect(err).ToNot(HaveOccurred())
@@ -480,7 +483,7 @@ var _ = Describe("Timeout tests", func() {
 					ln.Addr(),
 					"localhost",
 					getTLSClientConfig(),
-					getQuicConfig(nil),
+					getQuicConfig(&quic.Config{DisablePathMTUDiscovery: true}),
 				)
 				if err != nil {
 					clientErrChan <- err
